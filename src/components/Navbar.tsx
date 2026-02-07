@@ -11,7 +11,6 @@ export default function Navbar() {
       { label: "Rooms", href: "#rooms", id: "rooms" },
       { label: "Reviews", href: "#reviews", id: "reviews" },
       { label: "Contact", href: "#contact", id: "contact" },
-      { label: "Location", href: "#location", id: "location" },
     ],
     [],
   );
@@ -157,13 +156,6 @@ export default function Navbar() {
 
         {/* Actions + Mobile button */}
         <div className="flex items-center gap-2">
-          <button
-            onClick={() => goTo("#contact")}
-            className="hidden rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm font-medium text-[rgb(var(--forest,45,67,53))] shadow-[0_10px_24px_rgba(0,0,0,0.06)] transition hover:bg-black/3 sm:inline-flex"
-          >
-            Inquire
-          </button>
-
           <button
             onClick={() => goTo("#rooms")}
             className="hidden rounded-xl bg-[rgb(var(--coral,245,120,80))] px-4 py-2.5 text-sm font-medium text-white shadow-[0_12px_28px_rgba(0,0,0,0.14)] transition hover:brightness-95 sm:inline-flex"

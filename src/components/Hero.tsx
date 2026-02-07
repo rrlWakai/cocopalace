@@ -1,9 +1,34 @@
-import { motion, useReducedMotion } from "framer-motion";
+import { useRef } from "react";
+import {
+  motion,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+  type MotionStyle,
+} from "framer-motion";
 import heroImage from "../assets/images/Hero.png";
 
 export default function Hero() {
   const reduce = useReducedMotion();
+  const ref = useRef<HTMLElement | null>(null);
+
   const EASE_OUT: [number, number, number, number] = [0.16, 1, 0.3, 1];
+
+  // ✅ Track scroll relative to the HERO section (so parallax is noticeable)
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start start", "end start"], // 0 when hero hits top, 1 when hero leaves top
+  });
+
+  // 🎥 Parallax layers
+  // Background image: slower (moves less)
+  const bgY = useTransform(scrollYProgress, [0, 1], [0, -320]);
+  const bgScale = useTransform(scrollYProgress, [0, 1], [1.08, 1.18]);
+  const bgOpacity = useTransform(scrollYProgress, [0, 1], [1, 0.9]);
+
+  // Overlay gradient: faster (moves more) — this adds depth
+  const overlayY = useTransform(scrollYProgress, [0, 1], [0, -520]);
+  const overlayOpacity = useTransform(scrollYProgress, [0, 1], [1, 0.95]);
 
   const fadeUp = reduce
     ? {}
@@ -13,32 +38,45 @@ export default function Hero() {
         transition: { duration: 0.65, ease: EASE_OUT },
       };
 
+  const bgStyle: MotionStyle | undefined = reduce
+    ? undefined
+    : { y: bgY, scale: bgScale, opacity: bgOpacity };
+
+  const overlayStyle: MotionStyle | undefined = reduce
+    ? undefined
+    : { y: overlayY, opacity: overlayOpacity };
+
   return (
-    <section id="home" className="relative isolate overflow-hidden">
+    <section ref={ref} id="home" className="relative isolate overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0 -z-10">
-        <img
+        {/* Slow layer: image */}
+        <motion.img
           src={heroImage}
           alt="Coco Palace Hotel"
-          className="h-full w-full object-cover"
+          className="h-full w-full object-cover will-change-transform"
+          style={bgStyle}
         />
 
         {/* Base overlay */}
         <div className="absolute inset-0 bg-black/35" />
 
-        {/* Brand-aware luxury gradient: forest + coral hint */}
-        <div
+        {/* Fast layer: brand gradient (moves faster than image) */}
+        <motion.div
           className="
             absolute inset-0
+            will-change-transform
             bg-[radial-gradient(900px_520px_at_50%_20%,rgba(245,120,80,0.22),transparent_55%),linear-gradient(to_bottom,rgba(45,67,53,0.55)_0%,rgba(45,67,53,0.28)_35%,rgba(0,0,0,0.55)_75%,rgba(0,0,0,0.78)_100%)]
           "
+          style={overlayStyle}
         />
       </div>
 
       {/* Content */}
       <div className="relative">
         <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
-          <div className="flex min-h-[88vh] items-end pb-14 pt-28 sm:min-h-[92vh] sm:pb-16">
+          {/* ✅ Give the hero more scroll room so parallax is felt */}
+          <div className="flex min-h-[110vh] items-end pb-14 pt-28 sm:pb-16">
             {/* Center wrapper */}
             <div className="mx-auto w-full max-w-3xl text-center">
               {/* Eyebrow */}
